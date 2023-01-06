@@ -41,6 +41,7 @@ module.exports = {
           owner: "nicoten",
           name: "stiler",
         },
+        prerelease: false,
       },
     },
   ],

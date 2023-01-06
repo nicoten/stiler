@@ -4,7 +4,7 @@ const path = require("path");
 // Configure auto-updates
 require("update-electron-app")({
   repo: "nicoten/stiler",
-  updateInterval: "1 hour",
+  updateInterval: "5 minutes",
   logger: require("electron-log"),
 });
 
