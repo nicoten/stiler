@@ -1,12 +1,17 @@
-const { app, BrowserWindow } = require("electron");
+const { app, BrowserWindow, autoUpdater } = require("electron");
 const path = require("path");
 
 // Configure auto-updates
-require("update-electron-app")({
-  repo: "nicoten/stiler",
-  updateInterval: "5 minutes",
-  logger: require("electron-log"),
-});
+// require("update-electron-app")({
+//   updateInterval: "5 minutes",
+//   logger: require("electron-log"),
+// });
+
+// Manual config
+const server = "https://update.electronjs.org";
+const feed = `${server}/nicoten/stiler/${process.platform}-${process.arch}/1.0.4`;
+autoUpdater.setFeedURL(feed);
+autoUpdater.checkForUpdates();
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require("electron-squirrel-startup")) {
@@ -27,7 +32,7 @@ const createWindow = () => {
   mainWindow.loadFile(path.join(__dirname, "index.html"));
 
   // Open the DevTools.
-  // mainWindow.webContents.openDevTools();
+  mainWindow.webContents.openDevTools();
 };
 
 // This method will be called when Electron has finished

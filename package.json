@@ -1,7 +1,10 @@
 {
   "name": "stiler",
   "productName": "stiler",
-  "version": "1.0.7",
+  "repository": {
+    "url": "https://github.com/nicoten/stiler"
+  },
+  "version": "1.0.4",
   "description": "My Electron application description",
   "main": "src/index.js",
   "scripts": {
