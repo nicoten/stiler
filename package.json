@@ -8,6 +8,9 @@
     "start": "electron-forge start",
     "package": "electron-forge package",
     "make": "electron-forge make",
+    "publish-patch": "npm version patch && npm run publish",
+    "publish-minor": "npm version minor && npm run publish",
+    "publish-major": "npm version major && npm run publish",
     "publish": "electron-forge publish",
     "lint": "echo \"No linting configured\""
   },
