@@ -1,0 +1,77 @@
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&display=swap');
+
+html, body, #root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-smooth: always;
+}
+
+*:not(.code *, .monaco-editor *, code) {
+  font-family: 'IBM Plex Sans', sans-serif;
+}
+
+.code *, code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace !important;
+}
+
+* {
+  outline: none !important;
+}
+
+.ant-input-affix-wrapper:focus, .ant-input-affix-wrapper-focused {
+  box-shadow: none !important;
+}
+
+iframe {
+  display: none !important;
+}
+
+.ant-btn:focus, .ant-btn:hover {
+  color: #eee !important;
+}
+
+.mapboxgl-popup-content {
+  background-color: #222 !important;
+  padding: 10px !important;
+}
+
+.mapboxgl-popup {
+  max-width: 350px !important;
+}
+
+.mapboxgl-popup-anchor-bottom .mapboxgl-popup-tip {
+  border-top-color: #222 !important;
+}
+
+.mapboxgl-popup-anchor-top .mapboxgl-popup-tip {
+  border-bottom-color: #222 !important;
+}
+
+.mapboxgl-popup-anchor-left .mapboxgl-popup-tip {
+  border-right-color: #222 !important;
+}
+
+.mapboxgl-popup-anchor-right .mapboxgl-popup-tip {
+  border-left-color: #222 !important;
+}
+
+.ant-modal-title {
+  font-weight: bold !important;
+}
+
+.ant-form-item-label > label {
+  color: #888 !important;
+}
+
+.ant-form-item {
+  margin-bottom: 16px;
+}
+
+th {
+  font-weight: bold !important;
+}

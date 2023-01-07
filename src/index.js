@@ -1,4 +1,7 @@
 const { app, BrowserWindow, autoUpdater } = require("electron");
+const db = require('./server/db');
+const { initTileServer } = require('./server/tiles');
+require('./server/remote');
 const path = require("path");
 
 // Configure auto-updates
@@ -12,18 +15,27 @@ if (require("electron-squirrel-startup")) {
   app.quit();
 }
 
-const createWindow = () => {
+const createWindow = async () => {
+  await db.initDb();
+  await initTileServer();
+
   // Create the browser window.
   const mainWindow = new BrowserWindow({
-    width: 800,
-    height: 600,
+    width: 1200,
+    height: 800,
+    titleBarStyle: 'hiddenInset',
+    icon: __dirname + '/logo.png',
     webPreferences: {
-      preload: path.join(__dirname, "preload.js"),
+      nodeIntegration: true, // is default value after Electron v5
+      contextIsolation: true, // protect against prototype pollution
+      enableRemoteModule: true,
+      preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
     },
   });
 
   // and load the index.html of the app.
-  mainWindow.loadFile(path.join(__dirname, "index.html"));
+  // mainWindow.loadFile(path.join(__dirname, "index.html"));
+  mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
 
   // Open the DevTools.
   // mainWindow.webContents.openDevTools();
