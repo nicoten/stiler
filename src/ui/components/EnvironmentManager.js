@@ -287,7 +287,7 @@ const EnvironmentManager = () => {
     <>
       <Modal
         title="Configure Environments"
-        visible={visible}
+        open={visible}
         footer={null}
         onCancel={() => setVisible(false)}
         width="80%"

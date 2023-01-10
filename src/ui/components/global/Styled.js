@@ -38,9 +38,14 @@ export const DotDivider = styled.div`
 export const DotInput = styled(Input)`
   margin: 0;
   border: 0;
+  background-color: transparent !important;
   border-bottom: 1px dotted ${Colors.gray7};
   padding-left: 10px;
   padding-right: 0;
   border-radius: 0;
   outline: none;
+
+  input {
+    background-color: transparent !important;
+  }
 `;

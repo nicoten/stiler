@@ -40,7 +40,7 @@ const DataSourceEditor = ({ dataSource }) => {
         destroyOnClose
         style={{ top: 40 }}
         title={<div>Edit Data Source</div>}
-        visible={visible}
+        open={visible}
         size="small"
         onCancel={() => setVisible(false)}
         footer={

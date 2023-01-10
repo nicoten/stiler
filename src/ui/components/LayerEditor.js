@@ -39,7 +39,7 @@ const LayerEditor = ({ layer }) => {
             }}
           />
         }
-        visible={isDrawerVisible(`edit-layer-${layer.id}`)}
+        open={isDrawerVisible(`edit-layer-${layer.id}`)}
         onCancel={() => setDrawerId(null)}
         width={500}
         zIndex={20}

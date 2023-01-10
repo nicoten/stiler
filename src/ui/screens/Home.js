@@ -9,6 +9,7 @@ import React, { useContext, useEffect } from 'react';
 import styled from 'styled-components';
 import { Layout, Button, Collapse } from 'antd';
 
+import Colors from 'ui/Colors';
 import { AppContext } from 'ui/context/AppProvider';
 import Map from 'ui/components/Map';
 import Layers from 'ui/components/Layers';
@@ -22,6 +23,7 @@ import SiderItem from 'ui/components/SiderItem';
 const { Sider } = Layout;
 
 const StyledPanel = styled(Collapse.Panel)`
+  background-color: ${Colors.gray9};
   border: none !important;
 
   .ant-collapse-content-box {
@@ -84,7 +86,7 @@ const Home = () => {
       <Sider
         width={sidebarCollapsed ? 0 : SIDEBAR_WIDTH}
         style={{
-          background: '#222',
+          background: Colors.gray9,
           zIndex: 10,
           height: '100vh',
           overflowY: 'scroll',

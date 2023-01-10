@@ -4,6 +4,7 @@ import useState from 'react-usestateref';
 import React, { useEffect, createContext } from 'react';
 import { message } from 'antd';
 
+import { isNil} from 'lodash/fp';
 import { getLayerType } from 'ui/components/LayerOptions';
 import Loading from 'ui/components/Loading';
 import { percentToMapboxZoom } from 'ui/util/gis';
@@ -143,9 +144,13 @@ const AppProvider = ({ children }) => {
     api.getLayers({ workspaceId }).then(setLayers);
   }, [workspaceId, api]);
 
+  const getLayersInMap = () => {
+    return layers.filter(l => !!mapRef.current.getLayer(l.key));
+  }
+
   useEffect(() => {
     if (mapRef.current) {
-      layers.forEach(layer => {
+      getLayersInMap().forEach(layer => {
         const layerType = getLayerType(layer);
         mapRef.current.setPaintProperty(
           layer.key,
@@ -171,6 +176,10 @@ const AppProvider = ({ children }) => {
   };
 
   const addLayerToMap = async layer => {
+    if (isNil(layer.dataSourceId)) {
+      return;
+    }
+
     const { connection, variables } = getConnectionForDataSource({ dataSourceId: layer.dataSourceId });
 
     // Create the remote connection first, otherwise each
@@ -491,9 +500,7 @@ const AppProvider = ({ children }) => {
         // Map ------------------------------------------------------------
         map: mapRef.current,
         setMap,
-        getLayersInMap: () => {
-          return layers.filter(l => !!mapRef.current.getLayer(l.key));
-        },
+        getLayersInMap,
         // Layers ---------------------------------------------------------
         layers: layersRef.current,
         getLayers: () => layersRef.current,

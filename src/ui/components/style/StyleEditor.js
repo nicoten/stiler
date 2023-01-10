@@ -177,7 +177,7 @@ const OuterStyleEditor = ({ children, layer, label, property, ...rest }) => {
         : null}
       <StyledDrawer
         destroyOnClose
-        visible={isDrawerVisible(drawerId)}
+        open={isDrawerVisible(drawerId)}
         title={
           <b>
             {layer.name} - {label} Style

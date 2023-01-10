@@ -113,7 +113,7 @@ const WorkspaceSelect = () => {
         </Button>
       </h1>
       <DotDivider height="20px" />
-      <Modal title="New Project" visible={createVisible} footer={null} onCancel={() => setCreateVisible(false)}>
+      <Modal title="New Project" open={createVisible} footer={null} onCancel={() => setCreateVisible(false)}>
         <Form
           onFinish={v => {
             createWorkspace({ name: v.name }).then(() => setCreateVisible(false));

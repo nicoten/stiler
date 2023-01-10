@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import Colors from '../Colors';
 
 const Item = styled.div`
-  background-color: ${props => (props.selected ? Colors.blue8 : 'rgb(34, 34, 34)')};
+  background-color: ${props => (props.selected ? Colors.blue8 : Colors.gray9)};
   color: ${props => (props.selected ? Colors.gray0 : Colors.gray4)};
   cursor: ${props => (props.onClick ? 'pointer' : 'default')};
   display: flex;

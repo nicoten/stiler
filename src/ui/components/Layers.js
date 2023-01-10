@@ -72,7 +72,7 @@ const Layers = () => {
                           <LayerEditor layer={layer} />
                           <Collapse.Panel
                             style={{
-                              backgroundColor: 'rgba(34,34,34)',
+                              backgroundColor: Colors.gray9,
                             }}
                             header={
                               <div

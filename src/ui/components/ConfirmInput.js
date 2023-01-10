@@ -8,6 +8,7 @@ import { DotInput } from './global/Styled';
 
 const InputWrapper = styled.div`
   display: flex;
+  background-color: transparent;
   width: 100%;
   text-decoration: none !important;
   align-items: center;

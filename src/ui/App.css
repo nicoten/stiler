@@ -35,6 +35,10 @@ iframe {
   color: #eee !important;
 }
 
+.ant-btn-danger {
+  background-color: #f03e3e !important;
+}
+
 .mapboxgl-popup-content {
   background-color: #222 !important;
   padding: 10px !important;

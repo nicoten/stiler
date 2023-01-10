@@ -320,7 +320,7 @@ const Map = () => {
       // ([start, current]);
       const bbox = [start, current];
       const matchedFeatures = map.queryRenderedFeatures(bbox, {
-        layers: getLayers().map(l => l.key),
+        layers: getLayersInMap().map(l => l.key),
       });
 
       updateHoveredFeatures({ hoveredFeatures: matchedFeatures });
