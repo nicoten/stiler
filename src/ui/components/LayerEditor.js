@@ -1,5 +1,5 @@
 import { useContext, useState } from 'react';
-import { Alert, Divider, Form, Input, Button, Select, Popconfirm } from 'antd';
+import { Alert, Divider, Form, Button, Select, Popconfirm } from 'antd';
 import { DeleteOutlined } from '@ant-design/icons';
 import MonacoEditor from '@monaco-editor/react';
 import { isEmpty } from 'lodash/fp';
@@ -44,16 +44,25 @@ const LayerEditor = ({ layer }) => {
         width={500}
         zIndex={20}
         footer={
-          <Popconfirm
-            title="Are you sure?"
-            onConfirm={() => {
-              deleteLayer({ layer });
+          <div
+            style={{
+              display: 'flex',
             }}
           >
-            <Button icon={<DeleteOutlined />} type="danger" block>
-              Delete Layer
+            <Popconfirm
+              title="Are you sure?"
+              onConfirm={() => {
+                deleteLayer({ layer });
+              }}
+            >
+              <Button icon={<DeleteOutlined />} type="danger">
+                Delete
+              </Button>
+            </Popconfirm>
+            <Button type="primary" block onClick={() => setDrawerId(null)} style={{ marginLeft: 10 }}>
+              Ok
             </Button>
-          </Popconfirm>
+          </div>
         }
         mask={false}
       >
@@ -126,9 +135,8 @@ const LayerEditor = ({ layer }) => {
           }}
           {...formLayout}
         >
-          <Divider style={{ marginTop: 0 }}>Data Source</Divider>
           <Form.Item name="dataSourceId" label="Data Source" rules={[{ required: true }]}>
-            <Select>
+            <Select placeholder="Select...">
               {dataSources.map(c => (
                 <Select.Option key={c.id} value={c.id}>
                   {c.name}
@@ -136,6 +144,10 @@ const LayerEditor = ({ layer }) => {
               ))}
             </Select>
           </Form.Item>
+          <p>
+            Write a SQL statement that returns the records to display for this layer, including a geometry column in
+            SRID 4326
+          </p>
           <CodeWrapper>
             <MonacoEditor
               className="code"
@@ -146,6 +158,7 @@ const LayerEditor = ({ layer }) => {
               value={newCode}
               options={{
                 fontSize: 16,
+                wordWrap: true,
                 selectOnLineNumbers: true,
                 minimap: {
                   enabled: false,
@@ -165,7 +178,7 @@ const LayerEditor = ({ layer }) => {
                 });
               }}
             />
-            <Button block type="primary" onClick={() => form.submit()}>
+            <Button block type="primary" onClick={() => form.submit()} disabled={isEmpty(newCode)}>
               Run
             </Button>
           </CodeWrapper>
@@ -179,11 +192,7 @@ const LayerEditor = ({ layer }) => {
             />
           )}
           <Form.Item name="geometryColumn" label="Geometry Column">
-            <Select
-              disabled={isEmpty(geometryFields)}
-              placeholder="No geometry columns selected"
-              onChange={() => form.submit()}
-            >
+            <Select placeholder="Select a column..." disabled={isEmpty(geometryFields)} onChange={() => form.submit()}>
               {geometryFields.map(field => (
                 <Select.Option key={field.name} value={field.name}>
                   {field.name}
@@ -191,7 +200,7 @@ const LayerEditor = ({ layer }) => {
               ))}
             </Select>
           </Form.Item>
-          {!isEmpty(geometryFields) && (
+          {!isEmpty(layer.geometryColumn) && (
             <Form.Item name="geometryTypeId" label="Type" rules={[{ required: true }]}>
               <Select
                 onChange={v => {

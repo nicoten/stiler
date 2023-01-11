@@ -166,7 +166,7 @@ const InnerStyleEditor = ({ layer, property }) => {
 const OuterStyleEditor = ({ children, layer, label, property, ...rest }) => {
   const { isDrawerVisible, setDrawerId, updateLayerPaint } = useContext(AppContext);
 
-  const drawerId = `edit-layer-style-${layer.id}`;
+  const drawerId = `edit-layer-style-${layer.id}-${property}`;
 
   return (
     <>
@@ -177,6 +177,7 @@ const OuterStyleEditor = ({ children, layer, label, property, ...rest }) => {
         : null}
       <StyledDrawer
         destroyOnClose
+        key={drawerId}
         open={isDrawerVisible(drawerId)}
         title={
           <b>

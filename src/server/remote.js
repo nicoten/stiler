@@ -109,6 +109,9 @@ const testConnection = async ({ username, password, database, host, port, ssl, m
 
 const getRemoteConnection = connectionId => {
   return new Promise(async (resolve, reject) => {
+    console.log('sqlConnections[connectionId]');
+    console.log(sqlConnections[connectionId]);
+
     if (sqlConnections[connectionId]) {
       resolve(sqlConnections[connectionId]);
       return;
@@ -170,6 +173,9 @@ const getRemoteConnection = connectionId => {
           geometryDataTypeId: rows[0].oid,
         };
 
+        console.log('sqlConnections[connectionId]');
+        console.log(sqlConnections[connectionId]);
+
         resolve(sqlConnections[connectionId]);
       })
       .catch(err => {
@@ -210,6 +216,8 @@ const getMergedQuery = ({ variables: varArray = [], query }) => {
 };
 
 const getRemoteRecords = async ({ connectionId, variables, query, removeGeometryColumns }) => {
+  console.log('getRemoteRecords');
+
   const { pool, geometryDataTypeId } = await getRemoteConnection(connectionId);
 
   const mergedQuery = getMergedQuery({

@@ -18,7 +18,7 @@ const Dragger = styled.div`
   color: ${props => (props.light ? 'white' : Colors.gray9)};
   font-size: 18px;
   font-weight: bold;
-  padding: 5px 15px 3px 15px;
+  padding: 5px 0px 3px 0px;
   position: absolute;
   text-align: center;
   top: 0px;

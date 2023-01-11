@@ -17,6 +17,8 @@ const MIGRATIONS = ['20190301160011-create-all'];
 
 const initDb = async () => {
   const dbFileName = Util.isDev() ? 'db-dev' : 'db';
+  // In Mac:
+  // /Users/<username>/Application Support/stiler/
   const dbFilePath = `${app.getPath('userData')}/${dbFileName}.dbq`;
   db = new Database(dbFilePath);
 
@@ -101,6 +103,8 @@ const mutationHandler = sql => async (event, arg) => {
     for (let q = 0; q < sql.length; q++) {
       await execQuery(sql[q], arg);
     }
+  } else if (typeof sql === 'function') {
+    return sql(event, arg);
   } else {
     await execQuery(sql, arg);
   }
@@ -171,7 +175,9 @@ const CRUD = {
     WHERE id = :id
   `,
   // Data Sources
-  createDataSource: `
+  createDataSource: async (event, arg) => {
+    const [newDataSource] = await getRows(
+      `
     INSERT INTO data_source (
       workspace_id,
       name
@@ -179,7 +185,13 @@ const CRUD = {
     VALUES (
       :workspaceId, :name
     )
-  `,
+    RETURNING *
+    `,
+      arg,
+    );
+
+    return newDataSource;
+  },
   updateDataSource: `
     UPDATE data_source
     SET name = :name
@@ -205,7 +217,8 @@ const CRUD = {
     'DELETE FROM data_source WHERE id = :id',
   ],
   // Connections
-  createConnection: `
+  createConnection: [
+    `
     INSERT INTO connection (
       data_source_id,
       name,
@@ -220,6 +233,21 @@ const CRUD = {
       :dataSourceId, :name, :host, :port, :database, :username, :password, :ssl
     )
   `,
+    `
+    UPDATE data_source
+    SET
+      default_connection_id = COALESCE(
+        default_connection_id,
+        (
+          SELECT id
+          FROM connection
+          WHERE data_source_id = :dataSourceId
+          ORDER BY id LIMIT 1
+        )
+      )
+    WHERE id = :dataSourceId
+  `,
+  ],
   updateConnection: `
     UPDATE connection
     SET
@@ -234,7 +262,17 @@ const CRUD = {
     WHERE id = :id
   `,
   deleteConnection: [
-    'UPDATE data_source SET default_connection_id = NULL WHERE default_connection_id = :id',
+    `
+    UPDATE data_source
+    SET default_connection_id = (
+      SELECT id
+      FROM connection
+      WHERE data_source_id = data_source.id
+        AND id <> :id
+      ORDER BY id LIMIT 1
+    )
+    WHERE default_connection_id = :id
+    `,
     'DELETE FROM connection WHERE id = :id',
   ],
   // Environments
@@ -293,11 +331,110 @@ const CRUD = {
     INSERT INTO sub_environment (environment_id, name)
     VALUES (:environmentId, :name)
   `,
+  updateSubEnvironment: async (event, arg) => {
+    await execQuery(
+      `
+      UPDATE sub_environment
+      SET
+        name = :name,
+        color = :color,
+        json = :json
+      WHERE id = :id
+    `,
+      {
+        ...arg,
+        json: JSON.stringify(arg.json || {}),
+      },
+    );
+  },
   deleteSubEnvironment: `
     DELETE FROM sub_environment
     WHERE id = :id
   `,
   // Layers
+  createLayer: async (event, arg) => {
+    const [newLayer] = await getRows(
+      `
+    INSERT INTO layer (
+      workspace_id,
+      name,
+      layer_order
+    )
+    SELECT :workspaceId, :name, (
+      SELECT COALESCE(MAX(layer_order), 0) + 1
+      FROM layer
+      WHERE workspace_id = :workspaceId
+    )
+    RETURNING *
+    `,
+      arg,
+    );
+
+    return newLayer;
+  },
+  updateLayer: async (event, arg) => {
+    await execQuery(
+      `
+    UPDATE layer
+    SET
+      data_source_id = :dataSourceId,
+      name = :name,
+      code = :code,
+      geometry_column = :geometryColumn,
+      geometry_type_id = :geometryTypeId,
+      style = :style,
+      fields = :fields
+    WHERE id = :id
+    `,
+      {
+        ...arg,
+        style: JSON.stringify(arg.style || {}),
+        fields: JSON.stringify(arg.fields || {}),
+      },
+    );
+  },
+  moveLayer: async (event, arg) => {
+    const { from, to } = arg;
+
+    if (from === to) {
+      return;
+    }
+
+    if (from < to) {
+      await execQuery(
+        `
+      UPDATE layer
+      SET layer_order = layer_order - 1
+      WHERE workspace_id = :workspaceId
+        AND layer_order >= :from
+        AND layer_order <= :to
+      `,
+        arg,
+        true,
+      );
+    } else {
+      await execQuery(
+        `
+      UPDATE layer
+      SET layer_order = layer_order + 1
+      WHERE workspace_id = :workspaceId
+        AND layer_order >= :to
+        AND layer_order <= :from
+      `,
+        arg,
+        true,
+      );
+    }
+
+    await execQuery(
+      `
+    UPDATE layer
+    SET layer_order = :to
+    WHERE id = :id
+    `,
+      arg,
+    );
+  },
   renameLayer: `
     UPDATE layer SET name = :name
     WHERE id = :id
@@ -464,109 +601,6 @@ Object.entries(CRUD).forEach(([key, sql]) => {
 Object.entries(GETTERS).forEach(([key, { query, resolve }]) => {
   ipcMain.handle(key, getterHandler({ query, resolve }));
   methods[key] = getterHandler({ query, resolve });
-});
-
-ipcMain.handle('createLayer', async (event, arg) => {
-  const [newLayer] = await getRows(
-    `
-  INSERT INTO layer (
-    workspace_id,
-    name,
-    layer_order
-  )
-  SELECT :workspaceId, :name, (
-    SELECT COALESCE(MAX(layer_order), 0) + 1
-    FROM layer
-    WHERE workspace_id = :workspaceId
-  )
-  RETURNING *
-  `,
-    arg,
-  );
-
-  return newLayer;
-});
-
-ipcMain.handle('updateLayer', async (event, arg) => {
-  await execQuery(
-    `
-  UPDATE layer
-  SET
-    data_source_id = :dataSourceId,
-    name = :name,
-    code = :code,
-    geometry_column = :geometryColumn,
-    geometry_type_id = :geometryTypeId,
-    style = :style,
-    fields = :fields
-  WHERE id = :id
-  `,
-    {
-      ...arg,
-      style: JSON.stringify(arg.style || {}),
-      fields: JSON.stringify(arg.fields || {}),
-    },
-  );
-});
-
-ipcMain.handle('moveLayer', async (event, arg) => {
-  const { from, to } = arg;
-
-  if (from === to) {
-    return;
-  }
-
-  if (from < to) {
-    await execQuery(
-      `
-    UPDATE layer
-    SET layer_order = layer_order - 1
-    WHERE workspace_id = :workspaceId
-      AND layer_order >= :from
-      AND layer_order <= :to
-    `,
-      arg,
-      true,
-    );
-  } else {
-    await execQuery(
-      `
-    UPDATE layer
-    SET layer_order = layer_order + 1
-    WHERE workspace_id = :workspaceId
-      AND layer_order >= :to
-      AND layer_order <= :from
-    `,
-      arg,
-      true,
-    );
-  }
-
-  await execQuery(
-    `
-  UPDATE layer
-  SET layer_order = :to
-  WHERE id = :id
-  `,
-    arg,
-  );
-});
-
-ipcMain.handle('updateSubEnvironment', async (event, arg) => {
-  await execQuery(
-    `
-    UPDATE sub_environment
-    SET
-      name = :name,
-      color = :color,
-      json = :json
-    WHERE id = :id
-  `,
-    {
-      ...arg,
-      json: JSON.stringify(arg.json || {}),
-    },
-  );
 });
 
 // Exporters

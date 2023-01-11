@@ -11,12 +11,22 @@ import EditableText from 'ui/components/EditableText';
 
 const Wrapper = styled.div`
   padding: 40px 0px 0px 0px;
-  background-color: transparent;
+  background: ${Colors.gray9};
   height: 100%;
+`;
+
+const Header = styled.div`
+  display: flex;
+  color: white;
+  font-size: 26px;
+  font-weight: bold;
+  align-items: center;
+  padding: 0px 0px 20px 30px;
 `;
 
 const Title = styled.div`
   font-size: 26px;
+  margin: 10px 0px;
 `;
 
 const StyledCard = styled(Card)`
@@ -59,6 +69,9 @@ const Workspace = ({ workspace }) => {
           />
         </Title>
       }
+      onClick={() => {
+        setWorkspaceId(id);
+      }}
       bodyStyle={{ paddingTop: 0 }}
       style={{ margin: 10, width: 250 }}
       actions={[
@@ -78,7 +91,7 @@ const Workspace = ({ workspace }) => {
           }}
         >
           <div>
-            <DeleteOutlined style={{ marginRight: 10 }} /> Delete
+            <DeleteOutlined style={{ marginRight: 10 }} />
           </div>
         </Popconfirm>,
       ]}
@@ -91,7 +104,7 @@ const Workspace = ({ workspace }) => {
           <Tag color="gold">{layerCount}</Tag> Layer
           {layerCount === 1 ? '' : 's'}
         </div>
-        <div style={{ marginBottom: 10 }}>
+        <div style={{ marginBottom: 0 }}>
           <Tag color="green">{environmentCount}</Tag> Environment
           {environmentCount === 1 ? '' : 's'}
         </div>
@@ -106,12 +119,12 @@ const WorkspaceSelect = () => {
 
   return (
     <Wrapper id="workspace-select">
-      <h1 style={{ margin: '0px 30px 15px 30px' }}>
+      <Header>
         Projects{' '}
         <Button size="small" onClick={() => setCreateVisible(true)} style={{ marginLeft: 20 }}>
           New Project
         </Button>
-      </h1>
+      </Header>
       <DotDivider height="20px" />
       <Modal title="New Project" open={createVisible} footer={null} onCancel={() => setCreateVisible(false)}>
         <Form
@@ -131,6 +144,7 @@ const WorkspaceSelect = () => {
         {workspaces.map(w => (
           <Workspace key={w.id} workspace={w} />
         ))}
+        {workspaces.length === 0 && <Alert message="You don't have any projects, create one!" />}
       </div>
     </Wrapper>
   );

@@ -7,14 +7,14 @@ import {
 } from '@ant-design/icons';
 import React, { useContext, useEffect } from 'react';
 import styled from 'styled-components';
-import { Layout, Button, Collapse } from 'antd';
+import { Layout, Button, Collapse, Alert } from 'antd';
 
 import Colors from 'ui/Colors';
 import { AppContext } from 'ui/context/AppProvider';
 import Map from 'ui/components/Map';
 import Layers from 'ui/components/Layers';
 import SelectedRecords from 'ui/components/SelectedRecords';
-import DataSourceEditor from 'ui/components/DataSourceEditor';
+import DataSources from 'ui/components/DataSources';
 import { DotDivider } from 'ui/components/global/Styled';
 import EnvironmentManager from 'ui/components/EnvironmentManager';
 import ConfirmInput from 'ui/components/ConfirmInput';
@@ -102,15 +102,7 @@ const Home = () => {
           expandIcon={() => <ApiOutlined />}
         >
           <StyledPanel header={<b style={{ color: 'white' }}>Data Sources</b>} key="dataSources">
-            {dataSources.map(d => (
-              <DataSourceEditor key={d.id} dataSource={d} />
-            ))}
-            <SiderItem>
-              <ConfirmInput
-                placeholder="New Data Source..."
-                onConfirm={name => createDataSource({ dataSource: { name } })}
-              />
-            </SiderItem>
+            <DataSources />
           </StyledPanel>
         </Collapse>
         <Collapse bordered={false} defaultActiveKey="layers" expandIcon={() => <EnvironmentOutlined />}>

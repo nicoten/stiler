@@ -19,10 +19,10 @@ const Column = styled.div`
 
 export const layerOptionLayout = {
   labelCol: {
-    span: 6,
+    span: 7,
   },
   wrapperCol: {
-    span: 18,
+    span: 16,
   },
 };
 
@@ -49,6 +49,7 @@ const ColorOption = ({ layer, property, label }) => {
   // Its computed in ColorLab
   const style = get(`style.${property}`, layer);
   const colors = get(`style.${property}.colors`, layer);
+
   if (colors) {
     inner = (
       <StyleEditor layer={layer} property={property} label={label}>

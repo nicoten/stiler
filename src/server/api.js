@@ -1,6 +1,5 @@
 const { contextBridge, ipcRenderer } = require('electron');
 const os = require('os');
-const { Pool } = require('pg');
 const { builtins } = require('pg').types;
 const storage = require('electron-json-storage');
 const { message } = require('antd');
@@ -8,7 +7,7 @@ const { message } = require('antd');
 const utilities = require('./utilities');
 const { STYLE, MAX_DISTINCT_CATEGORIES } = require('../Constants');
 
-console.log('loading api...')
+console.log('loading api...');
 
 storage.setDataPath(os.tmpdir());
 
@@ -96,6 +95,8 @@ api.setStoredSetting = (key, value) => {
 };
 
 const getRemoteRecords = ({ connectionId, variables, query, removeGeometryColumns }) => {
+  console.log('getting remote records, api.js');
+
   return ipcRenderer.invoke('getRemoteRecords', {
     connectionId,
     variables,
@@ -105,6 +106,7 @@ const getRemoteRecords = ({ connectionId, variables, query, removeGeometryColumn
 };
 
 api.getRemoteTableColumns = async ({ connectionId, variables, code }) => {
+  console.log('getRemoteTableColumns, api.js');
   const { fields } = await getRemoteRecords({
     connectionId,
     variables,

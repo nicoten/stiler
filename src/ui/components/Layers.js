@@ -24,7 +24,7 @@ const LayerHandle = styled.div`
 const EditorWrapper = styled.div`
   background-color: ${Colors.gray9};
   box-shadow: inset 0px 0px 10px rgba(0, 0, 0, 0.5);
-  padding: 16px;
+  padding: 16px 0px;
 `;
 
 export const LayerIcon = ({ layer }) => {
@@ -106,10 +106,9 @@ const Layers = () => {
                           >
                             <EditorWrapper>
                               <Button
-                                block
                                 onClick={() => setDrawerId(`edit-layer-${layer.id}`)}
                                 icon={<EditOutlined />}
-                                style={{ marginBottom: 10 }}
+                                style={{ marginLeft: '16px', width: 'calc(100% - 32px)' }}
                               >
                                 Edit
                               </Button>

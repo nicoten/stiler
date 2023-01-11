@@ -4,7 +4,7 @@ import useState from 'react-usestateref';
 import React, { useEffect, createContext } from 'react';
 import { message } from 'antd';
 
-import { isNil} from 'lodash/fp';
+import { isNil } from 'lodash/fp';
 import { getLayerType } from 'ui/components/LayerOptions';
 import Loading from 'ui/components/Loading';
 import { percentToMapboxZoom } from 'ui/util/gis';
@@ -146,7 +146,7 @@ const AppProvider = ({ children }) => {
 
   const getLayersInMap = () => {
     return layers.filter(l => !!mapRef.current.getLayer(l.key));
-  }
+  };
 
   useEffect(() => {
     if (mapRef.current) {
@@ -330,6 +330,8 @@ const AppProvider = ({ children }) => {
           currentEnvironment.subEnvironments.find(s => s.id === currentWorkspace.currentSubEnvironmentId) || null,
       };
 
+    console.log('dataSources', dataSources);
+
     // Build the default environment
     return {
       environment: {
@@ -432,8 +434,10 @@ const AppProvider = ({ children }) => {
         // Data Sources ---------------------------------------------------
         dataSources,
         createDataSource: async ({ dataSource }) => {
-          await api.createDataSource({ ...dataSource, workspaceId });
-          api.getDataSources({ workspaceId }).then(setDataSources);
+          const { id } = await api.createDataSource({ ...dataSource, workspaceId });
+          const dataSources = await api.getDataSources({ workspaceId });
+          setDataSources(dataSources);
+          return dataSources.find(d => d.id === id);
         },
         updateDataSource: async ({ dataSource }) => {
           await api.updateDataSource(dataSource);
@@ -450,6 +454,7 @@ const AppProvider = ({ children }) => {
         // Connection Meta ---------------------------------------------------
         getRemoteTableColumns: async ({ dataSourceId, code }) => {
           const { connection, variables } = getConnectionForDataSource({ dataSourceId });
+          console.log({ connection, variables });
           return connection ? await api.getRemoteTableColumns({ connectionId: connection.id, variables, code }) : [];
         },
         // Connections --------------------------------------------------
