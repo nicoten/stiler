@@ -81,9 +81,6 @@ const getColor = ({ key, layer }) => {
     color = ['case', ['boolean', ['feature-state', 'hover'], false], chroma(fallback).brighten(0.5).hex(), fallback];
   }
 
-  // console.log('color');
-  // console.log(color);
-
   return color || DEFAULT_COLOR;
 };
 
@@ -330,8 +327,6 @@ const AppProvider = ({ children }) => {
           currentEnvironment.subEnvironments.find(s => s.id === currentWorkspace.currentSubEnvironmentId) || null,
       };
 
-    console.log('dataSources', dataSources);
-
     // Build the default environment
     return {
       environment: {
@@ -454,7 +449,6 @@ const AppProvider = ({ children }) => {
         // Connection Meta ---------------------------------------------------
         getRemoteTableColumns: async ({ dataSourceId, code }) => {
           const { connection, variables } = getConnectionForDataSource({ dataSourceId });
-          console.log({ connection, variables });
           return connection ? await api.getRemoteTableColumns({ connectionId: connection.id, variables, code }) : [];
         },
         // Connections --------------------------------------------------

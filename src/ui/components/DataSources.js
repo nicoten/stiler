@@ -4,7 +4,7 @@ import {
   Card,
   Checkbox,
   Collapse,
-  Divider,
+  Tooltip,
   Form,
   Input,
   InputNumber,
@@ -15,7 +15,7 @@ import {
 } from 'antd';
 
 import { useContext, useState } from 'react';
-import { CloseOutlined, DatabaseFilled, DeleteOutlined, PlusOutlined } from '@ant-design/icons';
+import { CloseOutlined, DatabaseFilled, DeleteOutlined, PlusOutlined, WarningOutlined } from '@ant-design/icons';
 
 import { KEYS } from 'Constants';
 
@@ -23,6 +23,7 @@ import { AppContext } from 'ui/context/AppProvider';
 import SiderItem from 'ui/components/SiderItem';
 import ConfirmInput from 'ui/components/ConfirmInput';
 import { DotInput } from 'ui/components/global/Styled';
+import Colors from '../Colors';
 
 const DataSourceEditor = ({ dataSource, visible, setEditingDataSourceId }) => {
   const { updateDataSource, deleteDataSource, deleteConnection, setDataSourceDefaultConnection } =
@@ -48,6 +49,7 @@ const DataSourceEditor = ({ dataSource, visible, setEditingDataSourceId }) => {
         size="small"
         onCancel={() => setEditingDataSourceId(null)}
         footer={
+          hasConnections &&
           !expandedConnection &&
           !createConnectionVisible && (
             <div
@@ -57,7 +59,7 @@ const DataSourceEditor = ({ dataSource, visible, setEditingDataSourceId }) => {
               }}
             >
               <Popconfirm
-                title="Are you sure?"
+                title="Are you sure you want to delete this data source?"
                 onConfirm={async () => {
                   deleteDataSource({ dataSource });
                   setEditingDataSourceId(null);
@@ -100,7 +102,7 @@ const DataSourceEditor = ({ dataSource, visible, setEditingDataSourceId }) => {
               </Button>
             )}
           </h3>
-          {createConnectionVisible && (
+          {(!hasConnections || createConnectionVisible) && (
             <Card
               size="small"
               title="New Connection"
@@ -164,11 +166,31 @@ const DataSourceEditor = ({ dataSource, visible, setEditingDataSourceId }) => {
           </Collapse>
         </>
       </Modal>
-      <SiderItem key={`dataSource-${dataSource.id}`} onClick={() => setEditingDataSourceId(dataSource.id)}>
+      <SiderItem
+        key={`dataSource-${dataSource.id}`}
+        onClick={() => setEditingDataSourceId(dataSource.id)}
+        suffix={
+          dataSource.connections.length === 0 && (
+            <Tooltip title="This DataSource has no connections!">
+              <WarningOutlined style={{ color: Colors.yellow6 }} />
+            </Tooltip>
+          )
+        }
+      >
         {dataSource.name}
       </SiderItem>
     </>
   );
+};
+
+const getDefaults = values => {
+  return {
+    host: values?.host || 'localhost',
+    port: values?.port || 5432,
+    database: values?.database || 'postgres',
+    username: values?.username || 'postgres',
+    password: values?.password || 'postgres',
+  };
 };
 
 const ConnectionEditor = ({ dataSource, connection, setExpandedConnection, setCreateConnectionVisible }) => {
@@ -197,11 +219,7 @@ const ConnectionEditor = ({ dataSource, connection, setExpandedConnection, setCr
           } else {
             createConnection({
               connection: {
-                host: newValues?.host || 'localhost',
-                port: newValues?.port || 5432,
-                database: newValues?.database || 'postgres',
-                username: newValues?.username || 'postgres',
-                password: newValues?.password || 'postgres',
+                ...getDefaults(newValues),
                 ...newValues,
                 ssl: newValues.ssl || false,
                 dataSourceId: dataSource.id,
@@ -220,7 +238,12 @@ const ConnectionEditor = ({ dataSource, connection, setExpandedConnection, setCr
           wrapperCol: { span: 18 },
         }}
       >
-        <Form.Item name="name" label="Nickname" {...formLayout} required>
+        <Form.Item
+          name="name"
+          label="Nickname"
+          {...formLayout}
+          rules={[{ required: true, message: 'Please enter a name' }]}
+        >
           <Input placeholder="Nickname" />
         </Form.Item>
         <Form.Item name="host" label="Host" {...formLayout} required>
@@ -249,16 +272,21 @@ const ConnectionEditor = ({ dataSource, connection, setExpandedConnection, setCr
             style={{ marginBottom: 20 }}
           />
         )}
+        {!testMessage && (
+          <Alert
+            showIcon
+            message="Click Test to make sure your connection works"
+            style={{ marginBottom: 20 }}
+            type="warning"
+          />
+        )}
         <div style={{ display: 'flex' }}>
           <Button
             onClick={async () => {
               const fields = form.getFieldsValue(true);
+
               const { success, error } = await window.api.testConnection({
-                username: fields.username,
-                password: fields.password,
-                host: fields.host,
-                port: fields.port,
-                database: fields.database,
+                ...getDefaults(fields),
                 ssl: fields.ssl,
               });
 

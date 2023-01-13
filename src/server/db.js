@@ -212,6 +212,7 @@ const CRUD = {
     WHERE id = :id
   `,
   deleteDataSource: [
+    'UPDATE data_source SET default_connection_id = NULL WHERE id = :id',
     'DELETE FROM environment_data_source_connection WHERE data_source_id = :id',
     'DELETE FROM connection WHERE data_source_id = :id',
     'DELETE FROM data_source WHERE id = :id',
@@ -293,7 +294,7 @@ const CRUD = {
     SET
       current_environment_id = NULL,
       current_sub_environment_id = NULL
-    WHERE environment_id = :id
+    WHERE current_environment_id = :id
     `,
     'DELETE FROM sub_environment WHERE environment_id = :id',
     'DELETE FROM environment_data_source_connection WHERE environment_id = :id',
